@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Folium with Flask</title>
+    <style>
+        .container{
+            background-color: #f1f1f1;
+        }
+        .ess-label{
+            word-wrap: break-word;
+        }
+        .map{
+            margin-left: {{ sidebar_width + 10}}px; /* +10 for padding of sidebar */
+        }
+        /* Style the sidebar */
+        .sidebar {
+            /* Set a default minimum width */
+            width: {{ sidebar_width }}px;
+            height: 100%;
+            position: fixed;
+            padding-top: 20px;
+            padding-left: 10px;
+            transition: min-width 0.5s; /* Add transition for smooth resizing */
+        }
+
+        .ess-list {
+            margin: 0;
+            padding: 0;
+            list-style-type: none;
+        }
+
+        .bss-list {
+            margin: 10px;
+            list-style-type: none;
+        }
+
+        .bss-item {
+
+        }
+
+        .ess-item {
+            padding: 3px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Networks</h2>
+        <form class="networksForm" action="{{ url_for("update_networks") }}" method="post">
+            <ul class="ess-list">
+                {% for ess in ess_list %}
+                <li class="ess-item">
+                    <input type="checkbox" id="{{ ess }}" name="{{ ess }}">
+                    <label for="{{ ess }}" class="ess-label">{{ ess }}</label>
+                </li>
+                <ul class="bss-list">
+                    {% for bss in bss_list %}
+                    <li class="ess-item">
+                        <input type="checkbox" id="{{ bss }}" name="{{ bss }}">
+                        <label for="{{ bss }}" class="bss-label">{{ bss }}</label>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endfor %}
+            </ul>
+        </form>
+    </div>
+
+    <!-- Map -->
+    <div class="map" >
+        {{ map_html|safe }}
+    </div>
+    <!-- JavaScript for dynamic width calculation -->
+</div>
+
+</body>
+</html>

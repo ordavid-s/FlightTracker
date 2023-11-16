@@ -1,8 +1,27 @@
 from flask import Flask, render_template, session, url_for, request, redirect, jsonify
-import folium
+from PacketParserInterface import PacketParserInterface
+from callbacks import *
 
 app = Flask(__name__)
 app.secret_key = 'veryyy_secret'
+
+bssid_data = {}
+essid_data = {}
+problem_data = {}
+dvr_data = {}
+flight_path = []
+targets = []
+
+# with app.app_context():
+#     # TODO : make sure time stamp data is sorted and gps data matches!
+#     print("(+) Analyzing Data...")
+#     file_path = "./resources/long.pcap"
+#     path = "/home/ordavid/Desktop/PacketParser/mypipe"
+#     pi = PacketParserInterface(file_path, path, parser_path="./PacketParser")
+#     # relevant register callbacks
+#     pi.read_data()
+#     pi.clean()
+
 
 bssid_data = {
     "a": [{"location": [51.508, -0.11], "rssi": -90, 'bssid': 'aa:bb:cc:dd:ee:ff', 'ssid': "cool"}],
@@ -54,10 +73,6 @@ def index():
 def update_networks():
     response = {}
     for net, status in request.form.items():
-        if net == "problem-984567318":
-            response[net] = problem_data
-        if net == "dvr-984567318":
-            response[net] = dvr_data
         if net in bssid_data:
             response[net] = bssid_data[net]
         elif net in essid_data:

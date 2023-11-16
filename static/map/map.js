@@ -7,14 +7,14 @@ L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/
 let netMarkers = [];
 let constantMarkers = [];
 
-function heatMapColorValue(value){
+function heatMapColorValue(value) {
     let h = (1.0 - value) * 240
     return "hsl(" + h + ", 100%, 50%)";
 }
 
-function addRssiCircle(data, markerGroup, border=false, color="", radius=300, opacity=0.5) {
-    if(color === ""){
-        color = heatMapColorValue(Math.min(30/Math.abs(data['rssi']), 1));
+function addRssiCircle(data, markerGroup, popupString, border = false, color = "", radius = 300, opacity = 0.5) {
+    if (color === "") {
+        color = heatMapColorValue(Math.min(30 / Math.abs(data['rssi']), 1));
     }
     let circle = L.circle(data['location'], {
         stroke: border,
@@ -23,12 +23,13 @@ function addRssiCircle(data, markerGroup, border=false, color="", radius=300, op
         fillOpacity: opacity,
         radius: radius
     });
-    circle.bindPopup(`${data['ssid']}  ||  ${data['bssid']}  ||  ${data['rssi']}dbm`);
+    circle.bindPopup(popupString);
     markerGroup.push(circle);
     circle.addTo(map);
 }
 
-function drawPath(pathData, markerGroup){
+
+function drawPath(pathData, markerGroup) {
     let line = L.polyline(pathData, {
         color: 'blue'
     })
@@ -36,21 +37,33 @@ function drawPath(pathData, markerGroup){
     line.addTo(map);
 }
 
-function handleConstantsKeyValue(key, value){
-    if(key === "flightPath"){
+function handleConstantsKeyValue(key, value) {
+    if (key === "flightPath") {
         drawPath(value, constantMarkers);
-    } else if(key === "problem"){
-        value.forEach((singlePointInfo)=>{
-            addRssiCircle(singlePointInfo, constantMarkers, true);
+    } else if (key === "problem") {
+        value.forEach((singlePointInfo) => {
+            addRssiCircle(singlePointInfo,
+                constantMarkers,
+                `${singlePointInfo['ssid']}  ||  ${singlePointInfo['bssid']}  ||  ${singlePointInfo['rssi']}dbm`,
+                true);
         })
 
-    } else if(key === "dvr"){
-        value.forEach((singlePointInfo)=>{
-            addRssiCircle(singlePointInfo, constantMarkers, true);
+    } else if (key === "dvr") {
+        value.forEach((singlePointInfo) => {
+            addRssiCircle(singlePointInfo,
+                constantMarkers,
+                `mac: ${singlePointInfo['mac']}  ||  ${singlePointInfo['bssid']}  ||  ${singlePointInfo['rssi']}dbm  || vendor: ${singlePointInfo['vendor']}`,
+                true);
         })
-    } else if(key === "targets"){
-        value.forEach((singlePointInfo)=>{
-            addRssiCircle(singlePointInfo, constantMarkers, true, 'red', 100, 1.0);
+    } else if (key === "targets") {
+        value.forEach((singlePointInfo) => {
+            addRssiCircle(singlePointInfo,
+                constantMarkers,
+                `${singlePointInfo['ssid']}  ||  ${singlePointInfo['bssid']}  ||  ${singlePointInfo['rssi']}dbm  || mac: ${singlePointInfo['mac']}`,
+                true,
+                'red',
+                100,
+                1.0);
         })
     }
 }
@@ -64,12 +77,15 @@ function updateNetworks() {
         }
     ).then(async (res) => {
         let ans = await res.json();
-        netMarkers.forEach((circ)=>{
+        netMarkers.forEach((circ) => {
             map.removeLayer(circ);
         })
-        for(const netInfo of Object.values(ans)){
-            netInfo.forEach((singlePointInfo)=>{
-                addRssiCircle(singlePointInfo, netMarkers);
+        for (const netInfo of Object.values(ans)) {
+            netInfo.forEach((singlePointInfo) => {
+                addRssiCircle(singlePointInfo,
+                    netMarkers,
+                    `${singlePointInfo['ssid']}  ||  ${singlePointInfo['bssid']}  ||  ${singlePointInfo['rssi']}dbm`,
+                );
             })
         }
     }).catch((res) => {
@@ -88,11 +104,11 @@ function updateConstants() {
     ).then(async (res) => {
         let ans = await res.json();
         // remove constant markers
-        constantMarkers.forEach((circ)=>{
+        constantMarkers.forEach((circ) => {
             map.removeLayer(circ);
         })
         // add all marked constants
-        for(const [key, value] of Object.entries(ans)){
+        for (const [key, value] of Object.entries(ans)) {
             handleConstantsKeyValue(key, value);
         }
     }).catch((res) => {

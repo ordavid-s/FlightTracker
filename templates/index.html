@@ -7,7 +7,11 @@
     <link rel="stylesheet" href={{ url_for(
     'static', filename='leaflet/leaflet.css') }} />
     <script src={{ url_for(
-    'static', filename='leaflet/leaflet.js') }} ></script>
+    'static', filename='leaflet/leaflet.js') }} /></script>
+    <link rel="stylesheet" href={{ url_for(
+    'static', filename='searchbar/search-bar.css') }} />
+    <script src={{ url_for(
+    'static', filename='searchbar/search-bar.js') }} /></script>
     <style>
         .container {
             background-color: #f1f1f1;
@@ -19,7 +23,9 @@
         .ess-label {
             word-wrap: break-word;
         }
-
+        .const-label {
+            word-wrap: break-word;
+        }
         #map {
             height: 100%;
         }
@@ -37,13 +43,13 @@
             transition: min-width 0.5s; /* Add transition for smooth resizing */
         }
 
-        .ess-list {
+        #ess-list {
             margin: 0;
             padding: 0;
             list-style-type: none;
         }
 
-        .bss-list {
+        #bss-list {
             margin: 10px;
             list-style-type: none;
         }
@@ -62,52 +68,43 @@
 <div class="container">
     <!-- Sidebar -->
     <div class="sidebar">
-        <h1>Networks</h1>
-        <form id="networks-form" onchange="updateNetworks()">
-            <ul class="ess-list">
-                {% for ess in ess_list %}
-                <li class="ess-item">
-                    <input type="checkbox" id="{{ ess }}" name="{{ ess }}">
-                    <label for="{{ ess }}" class="ess-label">{{ ess }}</label>
-                </li>
-                <ul class="bss-list">
-                    {% for bss in bss_list %}
+        <input type="text" id="search-bar" onkeyup="networkSearch()" placeholder="Search for names..">
+        <div>
+            <form id="networks-form" onchange="updateNetworks()">
+                <h3>Constants</h3>
+                <div>
+                    <input type="checkbox" id="problem-984567318" name="problem-984567318">
+                    <label for="problem-984567318" class="const-label">Problems</label>
+                    <input type="checkbox" id="dvr-984567318" name="dvr-984567318">
+                    <label for="dvr-984567318" class="const-label">DVR</label>
+                </div>
+                <h3>Networks</h3>
+                <ul id="ess-list" class="searchable">
+                    {% for ess, bss_list in ess_list.items() %}
                     <li class="ess-item">
-                        <input type="checkbox" id="{{ bss }}" name="{{ bss }}">
-                        <label for="{{ bss }}" class="bss-label">{{ bss }}</label>
+                        <input type="checkbox" id="{{ ess }}" name="{{ ess }}">
+                        <label for="{{ ess }}" class="ess-label">{{ ess }}</label>
+                         <ul id="bss-list">
+                        {% for bss in bss_list %}
+                        <li class="bss-item">
+                            <input type="checkbox" id="{{ bss }}" name="{{ bss }}">
+                            <label for="{{ bss }}" class="bss-label">{{ bss }}</label>
+                        </li>
+                        {% endfor %}
+                    </ul>
                     </li>
+
                     {% endfor %}
                 </ul>
-                {% endfor %}
-            </ul>
-        </form>
+            </form>
+        </div>
     </div>
 
     <!-- Map -->
     <div class="map-container">
         <div id="map"></div>
     </div>
-
-    <script>
-        var map = L.map('map').setView([51.505, -0.09], 13);
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        }).addTo(map);
-    </script>
-    <script>
-        function updateNetworks() {
-            const formData = new FormData(document.getElementById('networks-form'));
-            fetch('/update_networks',
-                {
-                    method: 'POST',
-                    body: formData
-                }
-            ).then((res) => {
-                location.reload();
-            })
-        }
-    </script>
+    <script src={{ url_for('static', filename='map/map.js') }} /></script>
 </div>
 
 

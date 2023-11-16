@@ -24,6 +24,19 @@ dvr_data = [
     {"location": [51.508, -0.09], "rssi": -90, 'bssid': 'aa:bb:cc:dd:ee:ff', 'ssid': "p2"}
 ]
 
+flight_path = [
+    [51.508, -0.08],
+    [51.508, -0.10],
+    [51.508, -0.11],
+    [51.514, -0.13],
+]
+
+targets = [
+    {"location": [51.508, -0.11], "rssi": -90, 'bssid': 'aa:bb:cc:dd:ee:ff', 'ssid': "p1"},
+    {"location": [51.508, -0.09], "rssi": -90, 'bssid': 'aa:bb:cc:dd:ee:ff', 'ssid': "p2"}
+]
+
+
 @app.route('/')
 def index():
     if 'selected_networks' not in session:
@@ -49,6 +62,21 @@ def update_networks():
             response[net] = bssid_data[net]
         elif net in essid_data:
             response[net] = essid_data[net]
+    return jsonify(response)
+
+
+@app.route('/update_constants', methods=['POST'])
+def update_constants():
+    response = {}
+    for const_name, status in request.form.items():
+        if const_name == "flightPath":
+            response[const_name] = flight_path
+        if const_name == "problem":
+            response[const_name] = problem_data
+        if const_name == "dvr":
+            response[const_name] = dvr_data
+        if const_name == "targets":
+            response[const_name] = targets
     return jsonify(response)
 
 

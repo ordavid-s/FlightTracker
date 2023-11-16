@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Folium with Flask</title>
+    <title>Flight Analyzer</title>
     <link rel="stylesheet" href={{ url_for(
     'static', filename='leaflet/leaflet.css') }} />
     <script src={{ url_for(
@@ -20,6 +20,9 @@
             height: 1000px;
         }
 
+        #networks-form{
+                overflow: auto;
+        }
         .ess-label {
             word-wrap: break-word;
         }
@@ -70,14 +73,21 @@
     <div class="sidebar">
         <input type="text" id="search-bar" onkeyup="networkSearch()" placeholder="Search for names..">
         <div>
-            <form id="networks-form" onchange="updateNetworks()">
+            <form id="constants-form" onchange="updateConstants()">
                 <h3>Constants</h3>
-                <div>
-                    <input type="checkbox" id="problem-984567318" name="problem-984567318">
-                    <label for="problem-984567318" class="const-label">Problems</label>
-                    <input type="checkbox" id="dvr-984567318" name="dvr-984567318">
-                    <label for="dvr-984567318" class="const-label">DVR</label>
+                <div class="constants-container">
+                    <input type="checkbox" id="flightPath" name="flightPath">
+                    <label for="flightPath" class="const-label">Flight Path</label>
+                    <input type="checkbox" id="problem" name="problem">
+                    <label for="problem" class="const-label">Problems</label>
+                    <br>
+                    <input type="checkbox" id="dvr" name="dvr">
+                    <label for="dvr" class="const-label">DVR</label>
+                    <input type="checkbox" id="targets" name="targets">
+                    <label for="targets" class="const-label">Targets</label>
                 </div>
+            </form>
+            <form id="networks-form" onchange="updateNetworks()">
                 <h3>Networks</h3>
                 <ul id="ess-list" class="searchable">
                     {% for ess, bss_list in ess_list.items() %}

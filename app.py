@@ -12,8 +12,20 @@ dvr_data = {}
 flight_path = []
 targets = []
 
+
+def parse_gps(path):
+    gps_data = []
+    timestamps = []
+    with open(path) as f:
+        lines = [l.rstrip('\n').split(",") for l in f.readlines()]
+    for l in lines:
+        timestamps.append(int(l[0]))
+        gps_data.append([float(l[2]), float(l[3])])
+    return timestamps, gps_data
+
 # with app.app_context():
 #     # TODO : make sure time stamp data is sorted and gps data matches!
+#     gps_data = parse_gps("./data.csv")
 #     print("(+) Analyzing Data...")
 #     file_path = "./resources/long.pcap"
 #     path = "/home/ordavid/Desktop/PacketParser/mypipe"
